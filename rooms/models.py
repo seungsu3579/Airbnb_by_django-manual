@@ -61,7 +61,7 @@ class Photo(core_models.TimeStampedModel):
 
     caption = models.CharField(max_length=80)
     file = models.ImageField()
-    room = models.ForeignKey("Room", on_delete=models.CASCADE)
+    room = models.ForeignKey("Room", related_name="photos", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.caption
@@ -85,13 +85,28 @@ class Room(core_models.TimeStampedModel):
     check_out = models.TimeField()
     instant_book = models.BooleanField(default=False)
 
-    # 이때 foreign key와 manytomany에서는 string으로 model을 표현하면 model에 접근 가능
-    # 물론 string으로 안해도 되지만 그러면 model 생성 순서에 영향을 받아 error가 뜨기도 함
-    host = models.ForeignKey("users.User", on_delete=models.CASCADE)
-    room_type = models.ForeignKey("RoomType", on_delete=models.SET_NULL, null=True)
-    amenities = models.ManyToManyField("Amenity", blank=True)
-    facilities = models.ManyToManyField("Facility", blank=True)
-    house_rules = models.ManyToManyField("HouseRule", blank=True)
+    # 1. 이때 foreign key와 manytomany에서는 string으로 model을 표현하면 model에 접근 가능
+    #    물론 string으로 안해도 되지만 그러면 model 생성 순서에 영향을 받아 error가 뜨기도 함
+    # 2. related_name = 을 통해 1:n relation 에서 1에서 접근할 때의 naming을 설정할 수 있음 (default는 ~~_set)
+    # 3. n:m relation인 ManyToMany에서는 변수명으로 접근 가능 (아래 같은 경우 roomobject.amenities)
+    #    ManyToMany에서도 related_name을 통해 반대로 접근할 변수를 설정 가능 (아래 같은 경우 amenityobject.rooms)
+    host = models.ForeignKey(
+        "users.User", related_name="rooms", on_delete=models.CASCADE
+    )
+    room_type = models.ForeignKey(
+        "RoomType", related_name="rooms", on_delete=models.SET_NULL, null=True
+    )
+    amenities = models.ManyToManyField("Amenity", related_name="rooms", blank=True)
+    facilities = models.ManyToManyField("Facility", related_name="rooms", blank=True)
+    house_rules = models.ManyToManyField("HouseRule", related_name="rooms", blank=True)
 
     def __str__(self):
         return self.name
+
+    def total_rating(self):
+        all_reviews = self.reviews.all()
+        all_ratings = 0
+        for review in all_reviews:
+            all_ratings += review.rating_average()
+
+        return all_ratings / len(all_reviews)

@@ -22,3 +22,23 @@ class CustomUserAdmin(UserAdmin):
             },
         ),
     )
+
+    # 기본적으로 UserAdmin을 상속받아 쓰고 있으므로 기존의 filter에 추가하여 설정해야함
+    list_filter = UserAdmin.list_filter + ("superhost",)
+
+    list_display = (
+        "username",
+        "first_name",
+        "last_name",
+        "email",
+        "is_active",
+        "language",
+        "currency",
+        "superhost",
+        "is_staff",
+        "is_superuser",
+    )
+
+
+# decorator를 쓰지 않고 admin 등록하는 방법
+# admin.site.register(models.User, CustomUserAdmin)
