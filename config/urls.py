@@ -15,7 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
 ]
+
+# 오로지 개발모드에서만 uploads 폴더에서 media 제공
+# 배포시에는 볼수 없게 설정 >> 이유 : 디스크 용량을 소비...
+if settings.DEBUG:
+    # Return a URL pattern for serving files in debug mode. (static에 대한 설명)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

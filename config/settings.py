@@ -128,3 +128,14 @@ USE_TZ = True
 STATIC_URL = "/static/"
 
 AUTH_USER_MODEL = "users.User"
+
+
+# MEDIA_ROOT가 가리키는 directory에서 사진과 같은 파일을 가져온다.(절대경로 사용)
+# 이때, os.path.join(BASE_DIR, "~~")을 사용하면 절대경로를 얻을 수 있다.
+# BASE_DIR은 이 프로젝트가 진행되는 절대경로를 가지고 있는 변수.
+MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
+
+# MEDIA URL을 설정. MEDIA_URL에 무엇이 오던 간에 MEDIA_ROOT를 다룸 (항상 끝은 /로 끝나야함)
+# 이때 "media/" 이렇게 사용하면 상대경로로 기존에 있던 url에서 추가되어서 url이 나타남
+#     "/media/" 이렇게 사용해야 절대경로로서 잡다한 경로가 나타나지 않음
+MEDIA_URL = "/media/"

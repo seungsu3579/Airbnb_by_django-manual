@@ -1,11 +1,23 @@
 from django.contrib import admin
+from django.utils.html import mark_safe
 from . import models
 
 # Register your models here.
+
+# admin안에 admin을 넣기 위함.(주로 ForiegnKey 속성 값을 추가함)
+# admin.TabularInlin, admin.StackedInline 2가지 종류가 있음
+class PhotoInline(admin.TabularInline):
+    # 집어넣을 모델 설정을 해줘야함
+    model = models.Photo
+
+
 @admin.register(models.Room)
 class RoomAdmin(admin.ModelAdmin):
 
     """Room Admin Definition"""
+
+    # admin 안에 admin 을 넣기 위해 위에서 생성한 class 추가
+    inlines = (PhotoInline,)
 
     # 세부 데이터를 보여줄때 group화
     fieldsets = (
@@ -61,8 +73,11 @@ class RoomAdmin(admin.ModelAdmin):
         "city",
     )
 
+    # 수많은 유저들이 있을때 host를 select하기 어렵기에 간단히 검색가능하게 함
+    raw_id_fields = ("host",)
+
     # admin 검색창 검색 column 설정 (^,=,@)
-    search_field = ("^city", "^host__username")
+    search_fields = ("^city", "^host__username")
 
     # ManyToMany Relation에서 작동하는 속성 >> admin에서 다르게 보여짐
     filter_horizontal = (
@@ -100,4 +115,11 @@ class PhotoAdmin(admin.ModelAdmin):
 
     """Photo Admin Definition"""
 
-    pass
+    list_display = ("__str__", "get_thumbnail")
+
+    def get_thumbnail(self, obj):
+        # django.utils.html 에서 mark_safe를 불러와 사용해야 입력값으로 html태그를 넣더라도 반영이됨
+        # 보안의 문제로 django에서 html 태그 입력값은 반영되지 않게 막아놓음
+        return mark_safe(f"<img width='70px' src={obj.file.url}>")
+
+    get_thumbnail.short_description = "Thumbnail"

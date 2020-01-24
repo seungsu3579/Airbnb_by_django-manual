@@ -60,7 +60,8 @@ class Photo(core_models.TimeStampedModel):
     """Photo Model Definition"""
 
     caption = models.CharField(max_length=80)
-    file = models.ImageField()
+    # ImageField 속성값으로 upload_to를 이용하여 MEDIA_ROOT안의 어떤 파일에 저장할건지 설정 가능
+    file = models.ImageField(upload_to="room_photos")
     room = models.ForeignKey("Room", related_name="photos", on_delete=models.CASCADE)
 
     def __str__(self):
