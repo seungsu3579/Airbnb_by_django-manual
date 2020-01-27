@@ -111,3 +111,12 @@ class Room(core_models.TimeStampedModel):
             all_ratings += review.rating_average()
 
         return all_ratings / len(all_reviews)
+
+    # 어디에서 변경되던 이 모델의 모든 변경은 저장하기 전에 이 메서드를 거쳐 실행됨
+    # admin에서의 변경만 intercept하고 싶다면 admin.ModelAdmin의 save_model()를 통해 설정가능
+    # admin에서 변경된 경우, save_model이 실행되고 모델의 save가 실행됨
+    def save(self, *args, **kwargs):
+
+        self.city = str.capitalize(self.city)
+        # super()로 상위 save method를 불러야함
+        super(Room, self).save(*args, **kwargs)  # Call the real save() method
