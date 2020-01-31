@@ -109,8 +109,10 @@ class Room(core_models.TimeStampedModel):
         all_ratings = 0
         for review in all_reviews:
             all_ratings += review.rating_average()
-
-        return all_ratings / len(all_reviews)
+        if len(all_reviews) != 0:
+            return round(all_ratings / len(all_reviews), 2)
+        else:
+            return 0
 
     # 어디에서 변경되던 이 모델의 모든 변경은 저장하기 전에 이 메서드를 거쳐 실행됨
     # admin에서의 변경만 intercept하고 싶다면 admin.ModelAdmin의 save_model()를 통해 설정가능

@@ -53,6 +53,7 @@ class RoomAdmin(admin.ModelAdmin):
         "instant_book",
         "count_amenities",
         "count_photos",
+        "total_rating",
     )
 
     # admin 필터 설정   host__superhost 이런식으로 ForiegnKey의 속성값에 접근 가능
